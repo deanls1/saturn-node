@@ -19,31 +19,33 @@ export let nodeToken = ''
 export const updateNodeToken = (newToken) => { nodeToken = newToken }
 
 function networkToOrchestrator () {
-  switch (SATURN_NETWORK) {
-    case 'main': {
-      return 'https://orchestrator.strn.pl'
-    }
-    case 'test': {
-      return 'https://orchestrator.saturn-test.network'
-    }
-    default: {
-      return 'http://localhost:10365'
-    }
-  }
+  // switch (SATURN_NETWORK) {
+  //   case 'main': {
+  //     return 'https://orchestrator.strn.pl'
+  //   }
+  //   case 'test': {
+  //     return 'https://orchestrator.saturn-test.network'
+  //   }
+  //   default: {
+  //     return 'http://localhost:10365'
+  //   }
+  // }
+  return 'https://orchestrator.saturn-test.network'
 }
 
 function networkToIngestor () {
-  switch (SATURN_NETWORK) {
-    case 'main': {
-      return 'https://twb3qukm2i654i3tnvx36char40aymqq.lambda-url.us-west-2.on.aws/'
-    }
-    case 'test': {
-      return 'https://mytvpqv54yawlsraubdzie5k2m0ggkjv.lambda-url.us-west-2.on.aws/'
-    }
-    default: {
-      return 'http://localhost:10364'
-    }
-  }
+  // switch (SATURN_NETWORK) {
+  //   case 'main': {
+  //     return 'https://twb3qukm2i654i3tnvx36char40aymqq.lambda-url.us-west-2.on.aws/'
+  //   }
+  //   case 'test': {
+  //     return 'https://mytvpqv54yawlsraubdzie5k2m0ggkjv.lambda-url.us-west-2.on.aws/'
+  //   }
+  //   default: {
+  //     return 'http://localhost:10364'
+  //   }
+  // }
+  return 'https://mytvpqv54yawlsraubdzie5k2m0ggkjv.lambda-url.us-west-2.on.aws/'
 }
 
 function error (requiredVarName) {
