@@ -2,12 +2,12 @@ import fs from 'node:fs'
 import fsPromises from 'node:fs/promises'
 import fetch from 'node-fetch'
 
-import { FIL_WALLET_ADDRESS, LOG_INGESTOR_URL, nodeId, nodeToken, TESTING_CID ,INFLUXDB_ADDR } from '../config.js'
+import { FIL_WALLET_ADDRESS, LOG_INGESTOR_URL, nodeId, nodeToken, TESTING_CID, INFLUXDB_ADDR } from '../config.js'
 import { debug as Debug } from '../utils/logging.js'
 import Influx from 'influxdb-nodejs'
 const debug = Debug.extend('log-ingestor')
 
-const client = new Influx('http://'+INFLUXDB_ADDR+'/saturn')
+const client = new Influx('http://' + INFLUXDB_ADDR + '/saturn')
 const fieldSchema = {
   addr: 'string',
   b: 'integer',
