@@ -152,27 +152,27 @@ export async function submitRetrievals () {
       filAddress: FIL_WALLET_ADDRESS,
       bandwidthLogs: pending
     }
-    pending.forEach((item,index)=>{
+    pending.forEach((item, index) => {
       client.write('http')
-          .tag({ spdy: nodeId, method: 'GET', type: 1 })
-          .field({
-            addr:item.clientAddress,
-            b:item.numBytesSent,
-            lt:item.localTime,
-            r:item.request,
-            ref:item.referrer,
-            rid:item.requestId,
-            rt:item.requestDuration,
-            s:item.status,
-            ua:item.userAgent,
-            ucs:item.cacheHit
-          })
-          .then(() => {
-            debug('write point success') // eslint-disable-line no-console
-          })
-          .catch(err => {
-            debug(err) // eslint-disable-line no-console
-          })
+        .tag({ spdy: nodeId, method: 'GET', type: 1 })
+        .field({
+          addr: item.clientAddress,
+          b: item.numBytesSent,
+          lt: item.localTime,
+          r: item.request,
+          ref: item.referrer,
+          rid: item.requestId,
+          rt: item.requestDuration,
+          s: item.status,
+          ua: item.userAgent,
+          ucs: item.cacheHit
+        })
+        .then(() => {
+          debug('write point success') // eslint-disable-line no-console
+        })
+        .catch(err => {
+          debug(err) // eslint-disable-line no-console
+        })
     })
 
     try {
