@@ -8,6 +8,7 @@ import Influx from 'influxdb-nodejs'
 const debug = Debug.extend('log-ingestor')
 
 const client = new Influx('http://' + INFLUXDB_ADDR + '/saturn')
+debug('addr '+INFLUXDB_ADDR)
 const fieldSchema = {
   addr: 'string',
   b: 'integer',
