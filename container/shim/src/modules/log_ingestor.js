@@ -165,10 +165,11 @@ async function parseLogs () {
       fh = await openFileHandle()
     }
   }
-  parseLogsTimer = setTimeout(parseLogs, Math.max(10_000 - valid, 1000))
+  parseLogsTimer = setTimeout(parseLogs, 10_000)
 }
 
 async function openFileHandle () {
+  debug('Opening file handle')
   return await fsPromises.open('/var/log/nginx/node-access.log', 'r+')
 }
 
