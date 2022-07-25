@@ -220,5 +220,5 @@ export async function submitRetrievals () {
       pending = body.bandwidthLogs.concat(pending)
     }
   }
-  submitRetrievalsTimer = setTimeout(submitRetrievals, Math.max(60_000 - length, 10_000))
+  submitRetrievalsTimer = setTimeout(submitRetrievals, 60_000)
 }
