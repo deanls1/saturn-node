@@ -71,7 +71,7 @@ async function parseLogs () {
   // }
 
   const read = await fh.readFile()
-
+debug('read ' + read.length)
   let valid = 0
   let hits = 0
   if (read.length > 0) {
