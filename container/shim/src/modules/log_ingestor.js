@@ -3,9 +3,10 @@ import fsPromises from 'node:fs/promises'
 import fetch from 'node-fetch'
 import prettyBytes from 'pretty-bytes'
 
-import { FIL_WALLET_ADDRESS, LOG_INGESTOR_URL, nodeId, nodeToken, TESTING_CID, INFLUXDB_ADDR } from '../config.js'
+import { FIL_WALLET_ADDRESS, INFLUXDB_ADDR, LOG_INGESTOR_URL, nodeId, nodeToken, TESTING_CID } from '../config.js'
 import { debug as Debug } from '../utils/logging.js'
 import Influx from 'influxdb-nodejs'
+
 const debug = Debug.extend('log-ingestor')
 
 const client = new Influx('http://' + INFLUXDB_ADDR + '/saturn')
@@ -41,7 +42,7 @@ const NGINX_LOG_KEYS_MAP = {
   ucs: 'cacheHit'
 }
 
-const ONE_GIGABYTE = 1073741823
+// const ONE_GIGABYTE = 1073741823
 
 let pending = []
 let fh, hasRead
@@ -61,13 +62,13 @@ export async function initLogIngestor () {
 
 async function parseLogs () {
   clearTimeout(parseLogsTimer)
-  const stat = await fh.stat()
-
-  if (stat.size > ONE_GIGABYTE) {
-    // Got to big we can't read it into single string
-    // TODO: stream read it
-    await fh.truncate()
-  }
+  // const stat = await fh.stat()
+  // todo: fix this
+  // if (stat.size > ONE_GIGABYTE) {
+  //   // Got to big we can't read it into single string
+  //   // TODO: stream read it
+  //   await fh.truncate()
+  // }
 
   const read = await fh.readFile()
 
@@ -110,7 +111,19 @@ async function parseLogs () {
       }, {})
 
       if (vars.request?.startsWith('/ipfs/') && vars.status === 200) {
-        const { clientAddress, numBytesSent, request, requestId, localTime, requestDuration, args, range, cacheHit, referrer, userAgent } = vars
+        const {
+          clientAddress,
+          numBytesSent,
+          request,
+          requestId,
+          localTime,
+          requestDuration,
+          args,
+          range,
+          cacheHit,
+          referrer,
+          userAgent
+        } = vars
         const cidPath = request.replace('/ipfs/', '')
         const [cid, ...rest] = cidPath.split('/')
         const filePath = rest.join('/')
