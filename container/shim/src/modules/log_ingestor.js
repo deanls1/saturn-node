@@ -22,7 +22,7 @@ const fieldSchema = {
   ucs: ['string']
 }
 const tagSchema = {
-  nodeID: '*',
+  nodeID: '*'
 }
 client.schema('', fieldSchema, tagSchema, {
   stripUnknown: true
@@ -153,7 +153,7 @@ export async function submitRetrievals () {
     }
     pending.forEach((item, index) => {
       client.write('http')
-        .tag( "nodeID", nodeId )
+        .tag('nodeID', nodeId)
         .field({
           addr: item.clientAddress,
           b: item.numBytesSent,
