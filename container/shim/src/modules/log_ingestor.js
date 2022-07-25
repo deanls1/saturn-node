@@ -8,7 +8,7 @@ import Influx from 'influxdb-nodejs'
 const debug = Debug.extend('log-ingestor')
 
 const client = new Influx('http://' + INFLUXDB_ADDR + '/saturn')
-debug('addr '+INFLUXDB_ADDR)
+debug('addr ' + INFLUXDB_ADDR)
 const fieldSchema = {
   addr: 'string',
   b: 'integer',
@@ -22,9 +22,7 @@ const fieldSchema = {
   ucs: ['string']
 }
 const tagSchema = {
-  spdy: ['speedy', 'fast', 'slow'],
-  method: '*',
-  type: [1, 2, 3, 4, 5]
+  nodeID: '*',
 }
 client.schema('', fieldSchema, tagSchema, {
   stripUnknown: true
@@ -155,7 +153,7 @@ export async function submitRetrievals () {
     }
     pending.forEach((item, index) => {
       client.write('http')
-        .tag({ spdy: nodeId, method: 'GET', type: 1 })
+        .tag( "nodeID", nodeId )
         .field({
           addr: item.clientAddress,
           b: item.numBytesSent,
@@ -169,10 +167,10 @@ export async function submitRetrievals () {
           ucs: item.cacheHit
         })
         .then(() => {
-          debug('write point success') // eslint-disable-line no-console
+          debug(`write point success ${index},client ${item.clientAddress}`) // eslint-disable-line no-console
         })
         .catch(err => {
-          debug(err) // eslint-disable-line no-console
+          debug(err)
         })
     })
 
