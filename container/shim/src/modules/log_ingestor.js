@@ -170,25 +170,25 @@ export async function submitRetrievals () {
 
     pending.forEach((item, index) => {
       client.write('http')
-          .tag('nodeID', nodeId)
-          .field({
-            addr: item.clientAddress,
-            b: item.numBytesSent,
-            lt: item.localTime,
-            r: item.request,
-            ref: item.referrer,
-            rid: item.requestId,
-            rt: item.requestDuration,
-            s: item.status,
-            ua: item.userAgent,
-            ucs: item.cacheHit
-          })
-          .then(() => {
-            debug(`write point success ${index},client ${item.clientAddress}`) // eslint-disable-line no-console
-          })
-          .catch(err => {
-            debug(err)
-          })
+        .tag('nodeID', nodeId)
+        .field({
+          addr: item.clientAddress,
+          b: item.numBytesSent,
+          lt: item.localTime,
+          r: item.request,
+          ref: item.referrer,
+          rid: item.requestId,
+          rt: item.requestDuration,
+          s: item.status,
+          ua: item.userAgent,
+          ucs: item.cacheHit
+        })
+        .then(() => {
+          debug(`write point success ${index},client ${item.clientAddress}`) // eslint-disable-line no-console
+        })
+        .catch(err => {
+          debug(err)
+        })
     })
     try {
       await fetch(LOG_INGESTOR_URL, {
