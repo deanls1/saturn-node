@@ -117,7 +117,7 @@ async function parseLogs () {
 
         if (cid === TESTING_CID) continue
         const { clientId } = args
-
+        debug('startsWith')
         pending.push({
           cacheHit,
           cid,
@@ -132,7 +132,9 @@ async function parseLogs () {
           requestId,
           userAgent
         })
+
         valid++
+        debug(valid)
         if (cacheHit) hits++
       }
     }
