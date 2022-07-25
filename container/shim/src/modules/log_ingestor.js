@@ -1,12 +1,10 @@
 import fs from 'node:fs'
 import fsPromises from 'node:fs/promises'
 import fetch from 'node-fetch'
-import prettyBytes from 'pretty-bytes'
 
-import { FIL_WALLET_ADDRESS, INFLUXDB_ADDR, LOG_INGESTOR_URL, nodeId, nodeToken, TESTING_CID } from '../config.js'
+import { FIL_WALLET_ADDRESS, LOG_INGESTOR_URL, nodeId, nodeToken, TESTING_CID, INFLUXDB_ADDR } from '../config.js'
 import { debug as Debug } from '../utils/logging.js'
 import Influx from 'influxdb-nodejs'
-
 const debug = Debug.extend('log-ingestor')
 
 const client = new Influx('http://' + INFLUXDB_ADDR + '/saturn')
@@ -42,8 +40,6 @@ const NGINX_LOG_KEYS_MAP = {
   ucs: 'cacheHit'
 }
 
-// const ONE_GIGABYTE = 1073741823
-
 let pending = []
 let fh, hasRead
 let parseLogsTimer
@@ -62,22 +58,14 @@ export async function initLogIngestor () {
 
 async function parseLogs () {
   clearTimeout(parseLogsTimer)
-  // const stat = await fh.stat()
-  // todo: fix this
-  // if (stat.size > ONE_GIGABYTE) {
-  //   // Got to big we can't read it into single string
-  //   // TODO: stream read it
-  //   await fh.truncate()
-  // }
-
   const read = await fh.readFile()
-debug('read ' + read.length)
-  let valid = 0
-  let hits = 0
+
   if (read.length > 0) {
     hasRead = true
     const lines = read.toString().trim().split('\n')
 
+    let valid = 0
+    let hits = 0
     for (const line of lines) {
       const vars = line.split('&&').reduce((varsAgg, currentValue) => {
         const [name, ...value] = currentValue.split('=')
@@ -111,26 +99,14 @@ debug('read ' + read.length)
       }, {})
 
       if (vars.request?.startsWith('/ipfs/') && vars.status === 200) {
-        const {
-          clientAddress,
-          numBytesSent,
-          request,
-          requestId,
-          localTime,
-          requestDuration,
-          args,
-          range,
-          cacheHit,
-          referrer,
-          userAgent
-        } = vars
+        const { clientAddress, numBytesSent, request, requestId, localTime, requestDuration, args, range, cacheHit, referrer, userAgent } = vars
         const cidPath = request.replace('/ipfs/', '')
         const [cid, ...rest] = cidPath.split('/')
         const filePath = rest.join('/')
 
         if (cid === TESTING_CID) continue
         const { clientId } = args
-        debug('startsWith')
+
         pending.push({
           cacheHit,
           cid,
@@ -145,16 +121,12 @@ debug('read ' + read.length)
           requestId,
           userAgent
         })
-
         valid++
-        debug(valid)
         if (cacheHit) hits++
       }
     }
     if (valid > 0) {
-      debug(`Parsed ${valid} valid retrievals in ${prettyBytes(read.length)} with hit rate of ${(hits / valid * 100).toFixed(0)}%`)
-        submitRetrievals()
-
+      debug(`Parsed ${valid} valid retrievals with hit rate of ${(hits / valid * 100).toFixed(0)}%`)
     }
   } else {
     if (hasRead) {
@@ -168,21 +140,17 @@ debug('read ' + read.length)
 }
 
 async function openFileHandle () {
-  debug('Opening file handle')
   return await fsPromises.open('/var/log/nginx/node-access.log', 'r+')
 }
 
 export async function submitRetrievals () {
   clearTimeout(submitRetrievalsTimer)
-  const length = pending.length
-  if (length > 0) {
+  if (pending.length > 0) {
     const body = {
       nodeId,
       filAddress: FIL_WALLET_ADDRESS,
       bandwidthLogs: pending
     }
-    pending = []
-
     pending.forEach((item, index) => {
       client.write('http')
         .tag('nodeID', nodeId)
@@ -205,6 +173,7 @@ export async function submitRetrievals () {
           debug(err)
         })
     })
+
     try {
       await fetch(LOG_INGESTOR_URL, {
         method: 'POST',
@@ -214,10 +183,10 @@ export async function submitRetrievals () {
           'Content-Type': 'application/json'
         }
       })
-      debug(`Submitted pending ${length} retrievals to wallet ${FIL_WALLET_ADDRESS}`)
+      debug(`Submitted pending ${pending.length} retrievals to wallet ${FIL_WALLET_ADDRESS}`)
+      pending = []
     } catch (err) {
       debug(`Failed to submit pending retrievals ${err.name} ${err.message}`)
-      pending = body.bandwidthLogs.concat(pending)
     }
   }
   submitRetrievalsTimer = setTimeout(submitRetrievals, 60_000)
