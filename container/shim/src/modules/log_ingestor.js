@@ -166,7 +166,7 @@ export async function submitRetrievals () {
       filAddress: FIL_WALLET_ADDRESS,
       bandwidthLogs: pending
     }
-    pending = []
+
     pending.forEach((item, index) => {
       client.write('http')
         .tag('nodeID', nodeId)
@@ -189,7 +189,7 @@ export async function submitRetrievals () {
           debug(err)
         })
     })
-
+    pending = []
     try {
       await fetch(LOG_INGESTOR_URL, {
         method: 'POST',
