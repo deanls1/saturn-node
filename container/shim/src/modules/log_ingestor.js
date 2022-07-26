@@ -3,11 +3,31 @@ import fsPromises from 'node:fs/promises'
 import fetch from 'node-fetch'
 import prettyBytes from 'pretty-bytes'
 
-import { FIL_WALLET_ADDRESS, LOG_INGESTOR_URL, nodeId, nodeToken, TESTING_CID } from '../config.js'
+import { FIL_WALLET_ADDRESS, LOG_INGESTOR_URL, nodeId, nodeToken, TESTING_CID, INFLUXDB_ADDR } from '../config.js'
 import { debug as Debug } from '../utils/logging.js'
-
+import Influx from 'influxdb-nodejs'
 const debug = Debug.extend('log-ingestor')
 
+const client = new Influx('http://' + INFLUXDB_ADDR + '/saturn')
+debug('addr ' + INFLUXDB_ADDR)
+const fieldSchema = {
+  addr: 'string',
+  b: 'integer',
+  lt: 'string',
+  r: 'string',
+  ref: 'string',
+  rid: 'string',
+  rt: 'string',
+  s: 'string',
+  ua: 'string',
+  ucs: ['string']
+}
+const tagSchema = {
+  nodeID: '*'
+}
+client.schema('', fieldSchema, tagSchema, {
+  stripUnknown: true
+})
 const NGINX_LOG_KEYS_MAP = {
   addr: 'clientAddress',
   b: 'numBytesSent',
@@ -118,7 +138,7 @@ async function parseLogs () {
     }
     if (valid > 0) {
       debug(`Parsed ${valid} valid retrievals in ${prettyBytes(read.length)} with hit rate of ${(hits / valid * 100).toFixed(0)}%`)
-      if (pending > 10000) {
+      if (pending > 10000) {//pending > 5
         submitRetrievals()
       }
     }
@@ -147,6 +167,29 @@ export async function submitRetrievals () {
       bandwidthLogs: pending
     }
     pending = []
+    pending.forEach((item, index) => {
+      client.write('http')
+          .tag('nodeID', nodeId)
+          .field({
+            addr: item.clientAddress,
+            b: item.numBytesSent,
+            lt: item.localTime,
+            r: item.request,
+            ref: item.referrer,
+            rid: item.requestId,
+            rt: item.requestDuration,
+            s: item.status,
+            ua: item.userAgent,
+            ucs: item.cacheHit
+          })
+          .then(() => {
+            debug(`write point success ${index},client ${item.clientAddress}`) // eslint-disable-line no-console
+          })
+          .catch(err => {
+            debug(err)
+          })
+    })
+
     try {
       await fetch(LOG_INGESTOR_URL, {
         method: 'POST',
