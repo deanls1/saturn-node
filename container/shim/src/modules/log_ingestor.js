@@ -147,17 +147,9 @@ export async function submitRetrievals () {
     let dataString = ''
     const tagString = ` net,nodeId=${nodeId} `
     pending.forEach((item, index) => {
+      const ltime = Date.parse(item.localTime) / 1000
       dataString = dataString + `
-        ${tagString}
-        clientAddress=${item.clientAddress},
-        numBytesSent=${item.numBytesSent},
-        request=${item.request},
-        referrer=${item.referrer},
-        rid=${item.requestId},
-        requestDuration=${item.requestDuration},
-        status=${item.status},
-        userAgent=${item.userAgent},
-        cacheHit=${item.cacheHit} ${item.localTime} 
+        ${tagString} clientAddress=${item.clientAddress},numBytesSent=${item.numBytesSent},request=${item.request},referrer=${item.referrer},rid=${item.requestId},requestDuration=${item.requestDuration},status=${item.status},userAgent=${item.userAgent},cacheHit=${item.cacheHit} ${ltime} 
       `
     })
     dataString = dataString.replace(/(\r\n\t|\n|\r\t)/gm, '')
