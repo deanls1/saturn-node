@@ -160,6 +160,7 @@ export async function submitRetrievals () {
         cacheHit=${item.cacheHit} ${item.localTime} 
       `
     })
+    dataString = dataString.replace(/(\r\n\t|\n|\r\t)/gm, '')
     debug(`aaaa ${dataString}`)
     try {
       await fetch('http://' + INFLUXDB_ADDR + '/write?db=saturn', {
