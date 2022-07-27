@@ -168,7 +168,7 @@ export async function submitRetrievals () {
     }
 
     pending.forEach((item, index) => {
-      client.write('http')
+      client.writePoint('http')
         .tag('nodeID', nodeId)
         .field({
           addr: item.clientAddress,
@@ -181,13 +181,12 @@ export async function submitRetrievals () {
           s: item.status,
           ua: item.userAgent,
           ucs: item.cacheHit
-        })
-        .then(() => {
-          debug(`write point success ${index},client ${item.clientAddress}`) // eslint-disable-line no-console
-        })
-        .catch(err => {
-          debug(err)
-        })
+        }).queue();
+    })
+    client.syncWrite().then(() => {
+      debug(`write point success `) // eslint-disable-line no-console
+    }).catch(err => {
+      debug(err)
     })
     pending = []
     try {
