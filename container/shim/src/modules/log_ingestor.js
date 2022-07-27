@@ -147,9 +147,10 @@ export async function submitRetrievals () {
     let dataString = ''
     const tagString = `net,nodeId=${nodeId}`
     pending.forEach((item, index) => {
-      let ltime = index * 100
-      ltime = ltime + Date.parse(item.localTime) * 1000 * 1000
-      dataString = dataString + ` ${tagString} clientAddress="${item.clientAddress}",numBytesSent=${item.numBytesSent},request="${item.request}",referrer="${item.referrer}",rid="${item.requestId}",requestDuration=${item.requestDuration},status="${item.status}",cacheHit="${item.cacheHit}" ${ltime}\n`
+      const time = (Date.parse(item.localTime) * 1000 * 1000) + index
+      debug(item.localTime, time, '2222')
+
+      dataString = dataString + ` ${tagString} clientAddress="${item.clientAddress}",numBytesSent=${item.numBytesSent},request="${item.request}",referrer="${item.referrer}",rid="${item.requestId}",requestDuration=${item.requestDuration},status="${item.status}",cacheHit="${item.cacheHit}" ${time}\n`
     })
     debug(`aaaa ${dataString}`)
     try {
