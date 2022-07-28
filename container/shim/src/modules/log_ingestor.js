@@ -5,7 +5,9 @@ import prettyBytes from 'pretty-bytes'
 
 import { FIL_WALLET_ADDRESS, LOG_INGESTOR_URL, nodeId, nodeToken, TESTING_CID, INFLUXDB_ADDR } from '../config.js'
 import { debug as Debug } from '../utils/logging.js'
+
 const debug = Debug.extend('log-ingestor')
+
 const NGINX_LOG_KEYS_MAP = {
   addr: 'clientAddress',
   b: 'numBytesSent',
@@ -115,10 +117,7 @@ async function parseLogs () {
       }
     }
     if (valid > 0) {
-      debug(`Parsed ${valid} valid retrievals in ${prettyBytes(read.length)} with hit rate of ${(hits / valid * 100).toFixed(0)}%`)
-      if (pending > 10000) { // pending > 5
-        submitRetrievals()
-      }
+      debug(`Parsed ${valid} valid retrievals in ${prettyBytes(read.length)} with hit rate of ${Number((hits / valid * 100).toFixed(2))}%`)
     }
   } else {
     if (hasRead) {
@@ -169,6 +168,8 @@ export async function submitRetrievals () {
     }
     pending = []
     try {
+      debug(`Submitting ${length} pending retrievals`)
+      const startTime = Date.now()
       await fetch(LOG_INGESTOR_URL, {
         method: 'POST',
         body: JSON.stringify(body),
@@ -177,7 +178,7 @@ export async function submitRetrievals () {
           'Content-Type': 'application/json'
         }
       })
-      debug(`Submitted pending ${length} retrievals to wallet ${FIL_WALLET_ADDRESS}`)
+      debug(`Submitted ${length} retrievals to wallet ${FIL_WALLET_ADDRESS} in ${Date.now() - startTime}ms`)
     } catch (err) {
       debug(`Failed to submit pending retrievals ${err.name} ${err.message}`)
       pending = body.bandwidthLogs.concat(pending)

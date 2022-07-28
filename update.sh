@@ -11,7 +11,7 @@ fi
 echo -n $(date -u) "Checking for update.sh script updates... "
 
 target=$HOME/update.sh
-if wget -O "$target.tmp" -T 10 -t 3 "https://raw.githubusercontent.com/filecoin-project/saturn-node/main/update.sh" && [[ -s "$target.tmp" ]] && [ $(stat -c %s "$target.tmp") -ne $(stat -c %s "$target") ]
+if wget -O "$target.tmp" -T 10 -t 3 "https://raw.githubusercontent.com/filecoin-saturn/L1-node/main/update.sh" && [[ -s "$target.tmp" ]] && [ $(stat -c %s "$target.tmp") -ne $(stat -c %s "$target") ]
 then
   mv -f "$target.tmp" "$target"
   chmod +x "$target"
@@ -24,7 +24,7 @@ fi
 
 echo -n $(date -u) "Checking for Saturn L1 node updates... "
 
-out=$(sudo docker pull ghcr.io/filecoin-project/saturn-node:$SATURN_NETWORK)
+out=$(sudo docker pull ghcr.io/filecoin-saturn/l1-node:$SATURN_NETWORK)
 
 if [[ $out != *"up to date"* ]]; then
   echo $(date -u) "New Saturn L1 node version found!"
@@ -33,9 +33,9 @@ if [[ $out != *"up to date"* ]]; then
   sleep $random_sleep
   echo "restarting...."
 
-  sudo docker stop --time 60 saturn-node || true
+  sudo docker stop --time 120 saturn-node || true
   sudo docker rm -f saturn-node || true
-  sudo docker run --name saturn-node -it -d --restart=unless-stopped -v $HOME/shared:/usr/src/app/shared -e FIL_WALLET_ADDRESS=$FIL_WALLET_ADDRESS -e NODE_OPERATOR_EMAIL=$NODE_OPERATOR_EMAIL --network host ghcr.io/filecoin-project/saturn-node:$SATURN_NETWORK
+  sudo docker run --name saturn-node -it -d --restart=unless-stopped -v $HOME/shared:/usr/src/app/shared -e FIL_WALLET_ADDRESS=$FIL_WALLET_ADDRESS -e NODE_OPERATOR_EMAIL=$NODE_OPERATOR_EMAIL --network host ghcr.io/filecoin-saturn/l1-node:$SATURN_NETWORK
   sudo docker image prune -f
 
   echo "Updated to latest version successfully!"
