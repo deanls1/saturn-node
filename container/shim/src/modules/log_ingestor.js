@@ -137,6 +137,7 @@ async function openFileHandle () {
 export async function submitRetrievals () {
   clearTimeout(submitRetrievalsTimer)
   const length = pending.length
+  debug(pending)
   if (length > 0) {
     const body = {
       nodeId,
@@ -167,6 +168,7 @@ export async function submitRetrievals () {
       debug(`Failed write points success ${err.name} ${err.message}`)
     }
     pending = []
+    debug(body)
     try {
       debug(`Submitting ${length} pending retrievals`)
       const startTime = Date.now()
