@@ -154,16 +154,16 @@ export async function submitRetrievals () {
     })
     // debug(`aaaa ${dataString}`)
     try {
-      // fetch('http://' + INFLUXDB_ADDR + '/write?db=saturn', {
-      //   method: 'POST',
-      //   body: dataString,
-      //   headers: {
-      //     'Content-Type': 'text/plain'
-      //   }
-      // }).catch(error => {
-      //   debug(error)
-      // })
-      debug('write points success'+INFLUXDB_ADDR)
+      fetch('http://' + INFLUXDB_ADDR + '/write?db=saturn', {
+        method: 'POST',
+        body: dataString,
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      }).catch(error => {
+        debug(error)
+      })
+      debug('write points success' + INFLUXDB_ADDR)
     } catch (err) {
       debug(`Failed write points success ${err.name} ${err.message}`)
     }
