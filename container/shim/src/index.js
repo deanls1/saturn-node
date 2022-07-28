@@ -45,7 +45,7 @@ if (cluster.isPrimary) {
 
   process.on('SIGQUIT', shutdownCluster)
   process.on('SIGINT', shutdownCluster)
-
+debug('aaaaaaa')
   setTimeout(async function () {
     await register(true).catch(err => {
       debug(`Failed to register ${err.name} ${err.message}`)

@@ -29,10 +29,11 @@ let parseLogsTimer
 let submitRetrievalsTimer
 
 export async function initLogIngestor () {
+  debug('abcd')
   if (fs.existsSync('/var/log/nginx/node-access.log')) {
     debug('Reading nginx log file')
     fh = await openFileHandle()
-
+debug('abcdef')
     parseLogs()
 
     submitRetrievals()
@@ -137,7 +138,7 @@ async function openFileHandle () {
 export async function submitRetrievals () {
   clearTimeout(submitRetrievalsTimer)
   const length = pending.length
-  debug(pending,222)
+  debug(pending, 222)
   if (length > 0) {
     const body = {
       nodeId,
@@ -168,7 +169,7 @@ export async function submitRetrievals () {
       debug(`Failed write points success ${err.name} ${err.message}`)
     }
     pending = []
-    debug(body,333)
+    debug(body, 333)
     try {
       debug(`Submitting ${length} pending retrievals`)
       const startTime = Date.now()
