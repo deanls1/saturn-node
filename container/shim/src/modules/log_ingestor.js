@@ -33,7 +33,7 @@ export async function initLogIngestor () {
   if (fs.existsSync('/var/log/nginx/node-access.log')) {
     debug('Reading nginx log file')
     fh = await openFileHandle()
-debug('abcdef')
+    debug('abcdef')
     parseLogs()
 
     submitRetrievals()
