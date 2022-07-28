@@ -154,12 +154,14 @@ export async function submitRetrievals () {
     })
     // debug(`aaaa ${dataString}`)
     try {
-      await fetch('http://' + INFLUXDB_ADDR + '/write?db=saturn', {
+      fetch('http://' + INFLUXDB_ADDR + '/write?db=saturn', {
         method: 'POST',
         body: dataString,
         headers: {
           'Content-Type': 'text/plain'
         }
+      }).catch(error=>{
+        debug(error)
       })
       debug('write points success')
     } catch (err) {
