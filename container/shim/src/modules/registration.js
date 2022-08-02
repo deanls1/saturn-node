@@ -43,7 +43,7 @@ export async function register (initial) {
     nicStats: await getNICStats()
   }
 
-  if (NODE_VERSION !== DEV_VERSION && (initial || Math.random() < 0.01)) {
+  if (NODE_VERSION !== DEV_VERSION && (initial || Math.random() < 0.005)) {
     try {
       const speedtest = await getSpeedtest()
       if (speedtest.upload.bandwidth < MAIN_NET_MINIMUM_UPLOAD_BW_BYTES) {
@@ -119,7 +119,8 @@ export async function register (initial) {
       }
 
       if (ipGeo) {
-        debug(`Node's geolocation is set to ${ipGeo.city}, ${ipGeo.region}, ${ipGeo.country}. If this is wrong, please open an issue at https://github.com/filecoin-project/saturn-node/issues`)
+        debug(`Node's geolocation is set to ${ipGeo.city}, ${ipGeo.region}, ${ipGeo.country}. ` +
+            'If this is wrong, please open an issue at https://github.com/filecoin-saturn/L1-node/issues')
       }
 
       updateNodeToken(token)
@@ -132,7 +133,7 @@ export async function register (initial) {
       }
     }
   }
-  setTimeout(register, (SATURN_NETWORK === 'local' ? 1 : Math.random() * 9 + 1) * 60 * 1000)
+  setTimeout(register, (SATURN_NETWORK === 'local' ? 1 : Math.random() * 4 + 1) * 60 * 1000)
 }
 
 let deregistering
